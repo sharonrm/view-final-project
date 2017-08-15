@@ -21,7 +21,7 @@ class Results extends Component {
 		return(
 
 			
-				<div>
+				<div className="responseData">
 					{this.renderResults(this.props.responseData)}
 				</div>
 		

@@ -24,11 +24,11 @@ class Chart extends Component {
         return ( <
             div className = "chart" >
             <
-            Pie data = { this.getScores(this.props.data) } options = {
-                {
+            Pie data = { this.getScores(this.props.data) } options = {{
+            	fontColor: "white",
+                fontSize: 18
 
-                }
-            }
+                }}
             /> <
             /div>
 

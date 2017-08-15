@@ -19,13 +19,13 @@ class Content extends Component {
 					datasets: [ 
 					{
 						label: "Tone Analysis",
-						data: [20,10,30,35,5],
+						data: [],
 						backgroundColor:[
-						"#F20530",
-						"#F25C78",
-						"#9FE4F2",
-						"#4FD4E1",
-						"#4FD4E1"]
+						"#3D9FCC",
+						"#7A8F99",
+						"#65FFDC",
+						"#FFA499",
+						"#CC3D50"]
 
 						}
 					]
@@ -33,7 +33,7 @@ class Content extends Component {
 				contentValue: "",
 				data: [],
 				url: 'http://localhost:3000/api',
-				mode: false,
+				mode: "analysis",
 				current: false,
 				results: [],
 				analysis: []
@@ -61,6 +61,7 @@ class Content extends Component {
 			// console.log(response.data.response.document_tone.tone_categories["0"].tones)
 			let dataState = this.state.chartData.datasets[0]
 			dataState.data = response.data.response.document_tone.tone_categories["0"].tones;
+			console.log('before setting state', dataState);
 			// setState
 			this.setState({dataState});
 			// console.log(this.state.chartData.datasets[0].data)
@@ -102,35 +103,36 @@ class Content extends Component {
 			})
 	   }
 
-	   //get last 5 results from table
+	   //get last 3 results from table - returns averages
 	   seeResult(){
 	   	console.log('inside SEE Results')
 	   	axios.get("http://localhost:3000/table")
 	   		 .then(response => this.setState({
 	   		 		mode: 'analysis',
 	   		 		analysis: response.data
-	   		 	},this.renderSummationofSearch)	
-   		 )
+	   		 	})	
+	   		 )	
 	   		 .catch(err=>console.log(err))
 	   }
 
+	//return averages
 	   renderSummationofSearch(){
-	   		// console.log('this is the array that we are getting back', this.state.analysis);
+	   		console.log('this is the array that we are getting back', this.state.analysis);
 	   		let analysisResults = this.state.analysis;
 	   		return(
-	  			<div>
-					<h3>Average for the last 3 querries</h3>
+	  			<div className="analysis">
+					<h3>Average</h3>
 						<ul>
-							<li>Anger: {analysisResults.anger_avg}</li>
-							<li>Disgust: {analysisResults.disgust_avg}</li>
-							<li>Fear: {analysisResults.fear_avg}</li>
-							<li>Joy: {analysisResults.joy_avg}</li>
-							<li>Sadness: {analysisResults.sadness}</li>
+							<li key="1">Anger: {analysisResults.anger_avg}</li>
+							<li key="2">Disgust: {analysisResults.disgust_avg}</li>
+							<li key="3">Fear: {analysisResults.fear_avg}</li>
+							<li key="4">Joy: {analysisResults.joy_avg}</li>
+							<li key="5">Sadness: {analysisResults.sadness}</li>
 						</ul>
 				</div>
 	   		)
 
-
+	   	
 	   }
 
 	   setEmotion(emotion) {
@@ -148,6 +150,12 @@ class Content extends Component {
 	   		return(<Emotion emotion={this.state.current} />)
 	   	} else if (this.state.mode==='analysis'){ 
 	   		return (<div>
+	   			<Results 
+					responseData={this.state.chartData.datasets[0].data} 
+					key={this.state.chartData.datasets[0].data.length + 1}
+					// setEmotion={this.setEmotion.bind(this)}
+				 	save={this.save.bind(this)}
+			 	/>
 	   				{this.renderSummationofSearch()}
 	   				</div>
 	   			)
@@ -159,38 +167,29 @@ class Content extends Component {
 	   		}
 	   }
 
-	   showChart(){
-	
-}
 
 	
+// <Nav changeMode = {this.changeMode.bind(this)} />
 	render() {
 		return(
 			<div className='container'>
-			<Chart data = {this.state.chartData}/>
-			{this.renderView()}
-			<form onSubmit={this.handleSubmit.bind(this)} id="usrform">
-				<label className='content'>
-				<textarea
-				    type="text" name="content"
-					value={this.state.contentValue}
-					onChange={this.handleContentChange.bind(this)}/>
+			
+				<form onSubmit={this.handleSubmit.bind(this)} id="usrform">
+					<label className='content'>
+						<textarea
+						    type="text" name="content"
+							value={this.state.contentValue}
+							onChange={this.handleContentChange.bind(this)}
+						/>
 					</label>
-						<div className="containerSubmit">
+					<div className="containerSubmit">
 						<input type="submit" value="Submit" id="submit" className="results-button" />
-							
-							<div className="results-button" id="view-saved" onClick={() => {this.seeResult()}}> View Saved </div>
-								<Results responseData={this.state.chartData.datasets[0].data} key={this.state.chartData.datasets[0].data.length + 1}
-							 // setEmotion={this.setEmotion.bind(this)}
-							 	save={this.save.bind(this)}
-							 	/>
-							</div>
-						
-					
-				
+						<div className="results-button" id="view-saved" onClick={() => {this.seeResult()}}> View Saved </div>
+					</div>	
 				</form>
-				<Nav changeMode = {this.changeMode.bind(this)} />
-				</div>
+				<Chart data = {this.state.chartData}/>
+				{this.renderView()}
+			</div>
 			
 		)
 	}
